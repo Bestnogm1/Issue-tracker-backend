@@ -2,6 +2,7 @@ import { Ticket } from '../models/tickets.js'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
 dayjs.extend(relativeTime)
+
 function index(req, res) {
   Ticket.find({})
   .populate(["owner"])
@@ -39,12 +40,18 @@ function update(req, res) {
 }
 
 function show(req, res) {
-  
+  Ticket.findByIf(req.params.id)
+  .populate("owner")
+  .then(ticket =>{
+    res.status(200).json(ticket)
+  })
+  .catch(err => res.json(err))
 }
 
 export {
   index,
   create,
   deleteTicket,
-  update
+  update,
+  show
 }
