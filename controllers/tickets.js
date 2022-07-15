@@ -26,14 +26,25 @@ function create(req, res) {
 }
 function deleteTicket(req, res) {
   Ticket.findByIdAndDelete(req.params.id)
+  .populate("owner")
   .then(ticket => res.json(ticket))
   .catch(err => res.status(500).json(err))
 }
 
+function update(req, res) {
+  Ticket.findOneAndDelete(req.params.id, req.body, {new: true})
+  .populate("owner")
+  .then(ticket => res.json(ticket))
+  .catch(err => res.json(err))
+}
 
+function show(req, res) {
+  
+}
 
 export {
   index,
   create,
-  deleteTicket
+  deleteTicket,
+  update
 }
