@@ -8,11 +8,13 @@ const ticketsSchema = new Schema(
   details: String,
   problems:{
     type: String,
-    enum: ['Software','Hardware']
+    enum: ['Software','Hardware'],
+    default: "Software"
   },
   severity:{
     type: String,
-    enum: ['Urgent', 'High', 'Normal', 'Low']
+    enum: ['Urgent', 'High', 'Normal', 'Low'],
+    default: "Low"
   },
   date: Date.parse(),
   owner: {
