@@ -1,17 +1,18 @@
 import { Ticket } from '../models/tickets.js'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime.js'
-dayjs.extend(relativeTime)
+
 
 function index(req, res) {
   Ticket.find({})
   .populate(["owner"])
-  .then(ticket => res.json(ticket))
+  .then((ticket)=>{
+    res.json(ticket.reverse())
+  })
   .catch(err => {
     console.log(err);
     res.status(500).json(err);
   })
 }
+
 function create(req, res) {
   req.body.owner = req.user.profile
   Ticket.create(req.body)
@@ -40,7 +41,7 @@ function update(req, res) {
 }
 
 function show(req, res) {
-  Ticket.findByIf(req.params.id)
+  Ticket.findById(req.params.id)
   .populate("owner")
   .then(ticket =>{
     res.status(200).json(ticket)
@@ -48,10 +49,21 @@ function show(req, res) {
   .catch(err => res.json(err))
 }
 
+//completed
+
+function completedOrNot(req, res) {
+  Ticket.findByIdAndUpdate(req.params.id, req.body ,{new: true},(error, result) => {
+    console.log(req.body);
+    res.send(result);
+    if (error) console.log(error);
+  }).populate("owner")
+}
+
 export {
   index,
   create,
   deleteTicket,
   update,
-  show
+  show,
+  completedOrNot 
 }
