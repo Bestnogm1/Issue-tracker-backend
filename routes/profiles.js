@@ -9,5 +9,6 @@ const router = Router();
 /*---------- Protected Routes ----------*/
 router.use(decodeUserFromToken);
 router.get("/", checkAuth, profilesCtrl.index);
+router.post("/findOneProfile", checkAuth, profilesCtrl.findOneProfile);
 
 export { router };

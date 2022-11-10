@@ -6,6 +6,8 @@ import cors from "cors";
 import { router as profilesRouter } from "./routes/profiles.js";
 import { router as authRouter } from "./routes/auth.js";
 import { router as ticketsRouter } from "./routes/tickets.js";
+import { router as messagesRouter } from "./routes/messages.js";
+
 import("./config/database.js");
 
 const app = express();
@@ -17,7 +19,8 @@ app.use(express.json());
 app.use("/api/profiles", profilesRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/tickets", ticketsRouter);
-// app.use('api/reviews'. commentsRouter)
+app.use("/api/messages", messagesRouter);
+
 app.use(function (req, res, next) {
   res.status(404).json({ err: "Not found" });
 });

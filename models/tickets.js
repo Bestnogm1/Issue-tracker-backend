@@ -6,7 +6,6 @@ const Schema = mongoose.Schema;
 
 const ticketsSchema = new Schema(
   {
-    assingedTo: String,
     details: String,
     subject: String,
     problems: {
@@ -22,11 +21,15 @@ const ticketsSchema = new Schema(
     newDate: {
       type: String,
     },
-    date: Date.parse(),
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Profile",
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
+    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
     completed: { type: Boolean, default: false },
   },
   {
