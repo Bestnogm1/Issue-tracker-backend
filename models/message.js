@@ -9,6 +9,7 @@ const messageSchema = new Schema(
     content: String,
     ownedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
     ticketId: String,
+    tempUUID: String,
   },
   {
     timestamps: true,

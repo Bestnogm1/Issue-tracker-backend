@@ -9,7 +9,7 @@ router.use(decodeUserFromToken);
 
 router.post("/createMessage", checkAuth, messagesCtrl.createMessage);
 router.get("/getAllMessage", checkAuth, messagesCtrl.getAllMessage);
-router.delete("/:ticketId/message/:messageId", checkAuth, messagesCtrl.delete);
+router.post("/deleteMessage", checkAuth, messagesCtrl.delete);
 // router.put("/:id", checkAuth, messagesCtrl.update);
 
 export { router };

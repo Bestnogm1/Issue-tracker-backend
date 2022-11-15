@@ -11,7 +11,8 @@ router.get("/:id", ticketsController.show);
 router.use(decodeUserFromToken);
 
 router.post("/", checkAuth, ticketsController.create);
-router.delete("/:id", checkAuth, ticketsController.deleteTicket);
+router.post("/updateTicketStatus", checkAuth, ticketsController.updateStatus);
+router.delete("/deleteTicket/:id", checkAuth, ticketsController.deleteTicket);
 // router.put('/:id',checkAuth , ticketsController.update)
 router.patch("/:id", checkAuth, ticketsController.completedOrNot);
 

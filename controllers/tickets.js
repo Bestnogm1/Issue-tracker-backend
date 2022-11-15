@@ -4,7 +4,7 @@ import { Profile } from "../models/profile.js";
 
 function index(req, res) {
   Ticket.find({})
-    .populate(["owner", "messages", "assignedTo"])
+    .populate(["owner", "assignees"])
     .then((ticket) => {
       res.json(ticket.reverse());
     })
@@ -17,15 +17,16 @@ function index(req, res) {
 function create(req, res) {
   req.body.owner = req.user.profile;
   Ticket.create(req.body)
-    .then((ticket) => {
-      ticket.populate(["owner", "assignedTo"]).then((ticket) => {
-        const profileId = ticket.assignedTo;
-        Profile.findById(profileId).then((profile) => {
-          profile.ticketAssignedToMe.push(ticket);
-          profile.save();
+    .then((createdTicket) => {
+      createdTicket.populate(["owner"]).then((tickets) => {
+        tickets.assignees.forEach((profile) => {
+          Profile.findById({ _id: profile._id }).then((profiles) => {
+            profiles.ticketAssignedToMe.push(tickets);
+            profiles.save();
+          });
         });
       });
-      res.status(200).json(ticket);
+      res.status(200).json(createdTicket);
     })
     .catch((err) => {
       console.log(err);
@@ -33,17 +34,27 @@ function create(req, res) {
     });
 }
 
+function updateStatus(req, res) {
+  const { _id, status } = req.body;
+  Ticket.findByIdAndUpdate({ _id: _id }, { status: status }).then((ticket) =>
+    ticket.save().then(() => res.sendStatus(200))
+  );
+}
+
 function deleteTicket(req, res) {
   Ticket.findById(req.params.id)
-    .then((ticket) => {
-      Ticket.findByIdAndDelete(req.params.id).then((ticket) => {
-        Profile.findByIdAndUpdate(ticket.assignedTo).then((profile) => {
-          profile.ticketAssignedToMe.remove({ _id: ticket._id });
-          console.log(req.params.id, "ticket id");
-          profile.save().then(() => res.sendStatus(200));
-        });
-        // Message.find()
-      });
+    .then((tickets) => {
+      deleteMessageAssignedWithTicket(req.params.id);
+      Ticket.findByIdAndDelete(req.params.id)
+        .then((deletedTicket) => {
+          deletedTicket.assignees.forEach((id) => {
+            Profile.findByIdAndUpdate(id).then((profile) => {
+              profile.ticketAssignedToMe.remove({ _id: deletedTicket._id });
+              profile.save();
+            });
+          });
+        })
+        .then(() => res.sendStatus(200));
     })
     .catch((err) => {
       console.error(err);
@@ -51,9 +62,13 @@ function deleteTicket(req, res) {
     });
 }
 
+function deleteMessageAssignedWithTicket(ticketId) {
+  Message.deleteMany({ ticketId: ticketId }).catch((err) => console.error(err));
+}
+
 function update(req, res) {
   Ticket.findOneAndDelete(req.params.id, req.body, { new: true })
-    .populate(["owner", "messages"])
+    .populate(["owner"])
     .then((ticket) => res.json(ticket))
     .catch((err) => res.json(err));
 }
@@ -68,7 +83,6 @@ function show(req, res) {
 }
 
 //completed
-
 function completedOrNot(req, res) {
   Ticket.findByIdAndUpdate(
     req.params.id,
@@ -81,4 +95,12 @@ function completedOrNot(req, res) {
   ).populate(["owner", "messages"]);
 }
 
-export { index, create, deleteTicket, update, show, completedOrNot };
+export {
+  index,
+  create,
+  deleteTicket,
+  update,
+  show,
+  completedOrNot,
+  updateStatus,
+};

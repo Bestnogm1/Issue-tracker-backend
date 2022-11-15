@@ -23,14 +23,10 @@ function createMessage(req, res) {
 }
 
 function deleteMessage(req, res) {
-  Message.findByIdAndDelete(req.params.messageId)
+  Message.findOneAndDelete(req.body)
     .then((message) => {
-      Ticket.findById(req.params.ticketId).then((ticket) => {
-        ticket.messages.remove(message);
-        ticket.save().then(() => {
-          res.sendStatus(200).json(message);
-        });
-      });
+      console.log(message);
+      res.sendStatus(200);
     })
     .catch((err) => {
       console.error(err);

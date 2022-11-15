@@ -30,13 +30,15 @@ function signup(req, res) {
       res.status(500).json({ err: err.message });
     });
 }
+
 function randomRGB() {
-  var x = Math.floor(Math.random() * 256);
-  var y = Math.floor(Math.random() * 256);
-  var z = Math.floor(Math.random() * 256);
-  var RGBColor = `${x},${y},${z}`;
+  const x = Math.floor(Math.random() * 256);
+  const y = Math.floor(Math.random() * 256);
+  const z = Math.floor(Math.random() * 256);
+  const RGBColor = `${x},${y},${z}`;
   return RGBColor;
 }
+
 function login(req, res) {
   User.findOne({ email: req.body.email })
     .then((user) => {
