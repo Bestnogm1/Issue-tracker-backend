@@ -1,6 +1,7 @@
 import { User } from "../models/user.js";
 import { Profile } from "../models/profile.js";
 import jwt from "jsonwebtoken";
+import * as path from "path";
 
 function signup(req, res) {
   Profile.findOne({ email: req.body.email })
@@ -14,6 +15,7 @@ function signup(req, res) {
           req.body.profile = newProfile._id;
           User.create(req.body)
             .then((user) => {
+              user.userImage = [req.body.name[0].toUpperCase(), randomRGB()];
               const token = createJWT(user);
               res.status(200).json({ token });
             })
@@ -27,6 +29,14 @@ function signup(req, res) {
     .catch((err) => {
       res.status(500).json({ err: err.message });
     });
+}
+
+function randomRGB() {
+  const x = Math.floor(Math.random() * 256);
+  const y = Math.floor(Math.random() * 256);
+  const z = Math.floor(Math.random() * 256);
+  const RGBColor = `${x},${y},${z}`;
+  return RGBColor;
 }
 
 function login(req, res) {

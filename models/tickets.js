@@ -6,23 +6,24 @@ const Schema = mongoose.Schema;
 
 const ticketsSchema = new Schema(
   {
-    assingedTo: String,
-    details: String,
-    subject: String,
-    problems: {
+    issue: {
       type: String,
-      enum: ["Software", "Hardware", "Bug", "Documentation"],
-      default: "Software",
+      enum: ["Task", "Bug", "Story"],
+      default: "Task",
     },
-    severity: {
+    title: String,
+    description: String,
+    assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+    priority: {
       type: String,
       enum: ["Urgent", "High", "Normal", "Low"],
       default: "Low",
     },
-    newDate: {
+    status: {
       type: String,
+      enum: ["Open Ticket", "In Progress", "On Hold", "Completed"],
+      default: "Open Ticket",
     },
-    date: Date.parse(),
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Profile",
