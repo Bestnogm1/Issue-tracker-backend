@@ -1,5 +1,4 @@
 import { Message } from "../models/message.js";
-import { Ticket } from "../models/tickets.js";
 
 function getAllMessage(req, res) {
   Message.find({})

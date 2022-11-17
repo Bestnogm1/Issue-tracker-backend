@@ -83,24 +83,4 @@ function show(req, res) {
 }
 
 //completed
-function completedOrNot(req, res) {
-  Ticket.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true },
-    (error, result) => {
-      res.send(result);
-      if (error) console.log(error);
-    }
-  ).populate(["owner", "messages"]);
-}
-
-export {
-  index,
-  create,
-  deleteTicket,
-  update,
-  show,
-  completedOrNot,
-  updateStatus,
-};
+export { index, create, deleteTicket, update, show, updateStatus };
