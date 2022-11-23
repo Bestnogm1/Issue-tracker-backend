@@ -1,12 +1,19 @@
 import { Ticket } from "../models/tickets.js";
 import { Message } from "../models/message.js";
 import { Profile } from "../models/profile.js";
+import {
+  deleteImageFromS3,
+  getAllTicketImage,
+} from "../middleware/AddingImage.js";
 
 function index(req, res) {
   Ticket.find({})
     .populate(["owner", "assignees"])
     .then((ticket) => {
-      res.json(ticket.reverse());
+      const ticketWithImage = getAllTicketImage(ticket);
+      ticketWithImage.then((test) => {
+        res.json(test);
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -15,8 +22,7 @@ function index(req, res) {
 }
 
 function create(req, res) {
-  req.body.owner = req.user.profile;
-  Ticket.create(req.body)
+  Ticket.create(req.body.ticketForm)
     .then((createdTicket) => {
       createdTicket.populate(["owner"]).then((tickets) => {
         tickets.assignees.forEach((profile) => {
@@ -44,6 +50,7 @@ function updateStatus(req, res) {
 function deleteTicket(req, res) {
   Ticket.findById(req.params.id)
     .then((tickets) => {
+      deleteImageFromS3(tickets);
       deleteMessageAssignedWithTicket(req.params.id);
       Ticket.findByIdAndDelete(req.params.id)
         .then((deletedTicket) => {
