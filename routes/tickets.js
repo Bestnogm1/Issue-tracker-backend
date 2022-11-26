@@ -6,15 +6,14 @@ import { addImagesToTicket } from "../middleware/AddingImage.js";
 const storage = multer.memoryStorage();
 const uploadImage = multer({ storage: storage });
 const router = Router();
-/*---------- Public Routes ----------*/
-router.get("/", ticketsController.index);
 
+/*---------- Public Routes ----------*/
+router.get("/", ticketsController.getAllTicket);
 router.post(
   "/addImagesToTicket",
   uploadImage.single("image"),
   addImagesToTicket
 );
-
 /*---------- Protected Routes ----------*/
 router.use(decodeUserFromToken);
 router.post("/", checkAuth, ticketsController.create);
