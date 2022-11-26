@@ -47,10 +47,10 @@ export async function sendImageToS3Bucket(tempUUID) {
     const url = await getSignedUrl(s3, command, { expiresIn: 571000 });
     const ticket = await Ticket.findOne({ tempUUID: tempUUID });
     ticket.imageUrl = url;
-    console.log(ticket);
     ticket.save();
   } catch (error) {
-    if (error) console.log(error);
+    console.error(err);
+    res.status(500).json(err);
   }
 }
 
@@ -80,6 +80,7 @@ export const getAllTicketImage = async (tickets) => {
       return [...tickets];
     }
   } catch (error) {
-    if (error) console.log(error);
+    console.error(err);
+    res.status(500).json(err);
   }
 };

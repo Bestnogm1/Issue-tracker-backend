@@ -5,7 +5,7 @@ const getAllMessage = async (req, res) => {
     const message = await Message.find({}).populate("ownedBy");
     res.status(200).json(message);
   } catch (error) {
-    console.log(err);
+    console.error(err);
     res.status(500).json(err);
   }
 };

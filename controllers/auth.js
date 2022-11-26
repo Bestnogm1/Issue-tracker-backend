@@ -31,14 +31,6 @@ function signup(req, res) {
     });
 }
 
-function randomRGB() {
-  const x = Math.floor(Math.random() * 256);
-  const y = Math.floor(Math.random() * 256);
-  const z = Math.floor(Math.random() * 256);
-  const RGBColor = `${x},${y},${z}`;
-  return RGBColor;
-}
-
 function login(req, res) {
   User.findOne({ email: req.body.email })
     .then((user) => {
