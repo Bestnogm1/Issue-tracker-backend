@@ -20,7 +20,7 @@ const s3 = new S3Client({
   },
 });
 
-export async function addImagesToTicket(req, res) {
+export const addImagesToTicket = async (req, res) => {
   try {
     const params = {
       Bucket: bucketName,
@@ -35,7 +35,7 @@ export async function addImagesToTicket(req, res) {
   } catch (error) {
     if (error) res.send(error);
   }
-}
+};
 
 export async function sendImageToS3Bucket(tempUUID) {
   try {
@@ -54,7 +54,7 @@ export async function sendImageToS3Bucket(tempUUID) {
   }
 }
 
-export async function deleteImageFromS3(tickets) {
+export const deleteImageFromS3 = async (tickets) => {
   try {
     const params = {
       Bucket: bucketName,
@@ -65,9 +65,9 @@ export async function deleteImageFromS3(tickets) {
   } catch (error) {
     if (error) console.error(error);
   }
-}
+};
 
-export async function getAllTicketImage(tickets) {
+export const getAllTicketImage = async (tickets) => {
   try {
     for (const ticket of tickets) {
       const getAllTicketToImageParams = {
@@ -82,4 +82,4 @@ export async function getAllTicketImage(tickets) {
   } catch (error) {
     if (error) console.log(error);
   }
-}
+};

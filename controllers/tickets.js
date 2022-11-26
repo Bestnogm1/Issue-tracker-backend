@@ -6,20 +6,15 @@ import {
   getAllTicketImage,
 } from "../middleware/AddingImage.js";
 
-function index(req, res) {
-  Ticket.find({})
-    .populate(["owner", "assignees"])
-    .then((ticket) => {
-      const ticketWithImage = getAllTicketImage(ticket);
-      ticketWithImage.then((test) => {
-        res.json(test);
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}
+const index = async (req, res) => {
+  try {
+    const allTicket = await Ticket.find({}).populate(["owner", "assignees"]);
+    const ticketWithImage = await getAllTicketImage(allTicket);
+    res.json(ticketWithImage);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
 
 function create(req, res) {
   Ticket.create(req.body.ticketForm)
@@ -41,6 +36,7 @@ function create(req, res) {
 }
 
 function updateStatus(req, res) {
+  console.log();
   const { _id, status } = req.body;
   Ticket.findByIdAndUpdate({ _id: _id }, { status: status }).then((ticket) =>
     ticket.save().then(() => res.sendStatus(200))
