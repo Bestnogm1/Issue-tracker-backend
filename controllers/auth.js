@@ -17,7 +17,6 @@ function signup(req, res) {
         throw new Error("no SECRET in .env file");
       } else {
         Profile.create(req.body).then((newProfile) => {
-          console.log(newProfile);
           req.body.profile = newProfile._id;
           User.create(req.body)
             .then((user) => {
