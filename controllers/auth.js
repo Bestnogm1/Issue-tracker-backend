@@ -3,6 +3,11 @@ import { Profile } from "../models/profile.js";
 import jwt from "jsonwebtoken";
 import * as path from "path";
 
+const randomHexCodeColor = () => {
+  const hexCodes = ["442288", "6CA2EA", "B5D33D", "EB7D5B", "FED23F"];
+  return hexCodes[Math.floor(Math.random() * 5)];
+};
+
 function signup(req, res) {
   Profile.findOne({ email: req.body.email })
     .then((profile) => {
@@ -12,10 +17,10 @@ function signup(req, res) {
         throw new Error("no SECRET in .env file");
       } else {
         Profile.create(req.body).then((newProfile) => {
+          console.log(newProfile);
           req.body.profile = newProfile._id;
           User.create(req.body)
             .then((user) => {
-              user.userImage = [req.body.name[0].toUpperCase(), randomRGB()];
               const token = createJWT(user);
               res.status(200).json({ token });
             })
@@ -29,14 +34,6 @@ function signup(req, res) {
     .catch((err) => {
       res.status(500).json({ err: err.message });
     });
-}
-
-function randomRGB() {
-  const x = Math.floor(Math.random() * 256);
-  const y = Math.floor(Math.random() * 256);
-  const z = Math.floor(Math.random() * 256);
-  const RGBColor = `${x},${y},${z}`;
-  return RGBColor;
 }
 
 function login(req, res) {

@@ -4,6 +4,8 @@ const profileSchema = new Schema(
   {
     email: { type: String, required: true, lowercase: true, unique: true },
     name: String,
+    lastName: String,
+    profilePicture: String,
     ticketAssignedToMe: [{ type: Schema.Types.ObjectId, ref: "Ticket" }],
   },
   {

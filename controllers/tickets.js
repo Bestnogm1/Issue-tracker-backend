@@ -1,86 +1,83 @@
 import { Ticket } from "../models/tickets.js";
 import { Message } from "../models/message.js";
 import { Profile } from "../models/profile.js";
+import {
+  deleteImageFromS3,
+  getAllTicketImage,
+} from "../middleware/AddingImage.js";
 
-function index(req, res) {
-  Ticket.find({})
-    .populate(["owner", "assignees"])
-    .then((ticket) => {
-      res.json(ticket.reverse());
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}
+const getAllTicket = async (req, res) => {
+  try {
+    const allTicket = await Ticket.find({}).populate(["owner", "assignees"]);
+    const ticketWithImage = await getAllTicketImage(allTicket);
+    res.json(ticketWithImage);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-function create(req, res) {
-  req.body.owner = req.user.profile;
-  Ticket.create(req.body)
-    .then((createdTicket) => {
-      createdTicket.populate(["owner"]).then((tickets) => {
-        tickets.assignees.forEach((profile) => {
-          Profile.findById({ _id: profile._id }).then((profiles) => {
-            profiles.ticketAssignedToMe.push(tickets);
-            profiles.save();
-          });
-        });
-      });
-      res.status(200).json(createdTicket);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}
+const create = async (req, res) => {
+  try {
+    const createdTicket = await Ticket.create(req.body.ticketForm);
+    const tickets = await createdTicket.populate(["owner"]);
+    for (const ticket of tickets.assignees) {
+      const profiles = await Profile.findById({ _id: ticket._id });
+      profiles.ticketAssignedToMe.push(createdTicket);
+      profiles.save();
+    }
+    res.status(200).json(createdTicket);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-function updateStatus(req, res) {
-  const { _id, status } = req.body;
-  Ticket.findByIdAndUpdate({ _id: _id }, { status: status }).then((ticket) =>
-    ticket.save().then(() => res.sendStatus(200))
-  );
-}
+const updateStatus = async (req, res) => {
+  try {
+    const { tempUUID, status } = req.body;
+    const ticket = await Ticket.findOneAndUpdate(
+      { tempUUID: tempUUID },
+      { status: status }
+    );
+    ticket.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-function deleteTicket(req, res) {
-  Ticket.findById(req.params.id)
-    .then((tickets) => {
-      deleteMessageAssignedWithTicket(req.params.id);
-      Ticket.findByIdAndDelete(req.params.id)
-        .then((deletedTicket) => {
-          deletedTicket.assignees.forEach((id) => {
-            Profile.findByIdAndUpdate(id).then((profile) => {
-              profile.ticketAssignedToMe.remove({ _id: deletedTicket._id });
-              profile.save();
-            });
-          });
-        })
-        .then(() => res.sendStatus(200));
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json(err);
-    });
-}
+const deleteTicket = async (req, res) => {
+  try {
+    const { tempUUID } = req.params;
+    const tickets = await Ticket.findOne({ tempUUID: tempUUID });
+    await deleteImageFromS3(tickets);
+    await deleteMessageAssignedWithTicket(tickets._id);
+    const deletedTicket = await Ticket.findByIdAndDelete(tickets._id);
+    await deletedTicketFromAssignees(deletedTicket);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-function deleteMessageAssignedWithTicket(ticketId) {
-  Message.deleteMany({ ticketId: ticketId }).catch((err) => console.error(err));
-}
+const deletedTicketFromAssignees = async (deletedTicket) => {
+  for (const ticketId of deletedTicket.assignees) {
+    const profile = await Profile.findByIdAndUpdate(ticketId);
+    profile.ticketAssignedToMe.remove({ _id: deletedTicket._id });
+    profile.save();
+  }
+};
 
-function update(req, res) {
-  Ticket.findOneAndDelete(req.params.id, req.body, { new: true })
-    .populate(["owner"])
-    .then((ticket) => res.json(ticket))
-    .catch((err) => res.json(err));
-}
+const deleteMessageAssignedWithTicket = async (ticketId) => {
+  try {
+    Message.deleteMany({ ticketId: ticketId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-function show(req, res) {
-  Ticket.findById(req.params.id)
-    .populate(["owner", "messages"])
-    .then((ticket) => {
-      res.status(200).json(ticket);
-    })
-    .catch((err) => res.json(err));
-}
-
-//completed
-export { index, create, deleteTicket, update, show, updateStatus };
+export { getAllTicket, create, deleteTicket, updateStatus };

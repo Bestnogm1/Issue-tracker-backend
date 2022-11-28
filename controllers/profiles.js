@@ -1,22 +1,26 @@
 import { Profile } from "../models/profile.js";
 
-function index(req, res) {
-  Profile.find({})
-    .then((profiles) => res.json(profiles))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}
-function findOneProfile(req, res) {
-  let { profileId } = req.body;
-  Profile.findById(profileId)
-    .populate("ticketAssignedToMe")
-    .then((profiles) => res.json(profiles))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}
+const getAllProfile = async (req, res) => {
+  try {
+    const profile = await Profile.find({});
+    res.json(profile);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
 
-export { index, findOneProfile };
+const findOneProfile = async (req, res) => {
+  try {
+    let { profileId } = req.body;
+    const profile = await Profile.findById(profileId).populate(
+      "ticketAssignedToMe"
+    );
+    res.json(profile);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(err);
+  }
+};
+
+export { getAllProfile, findOneProfile };

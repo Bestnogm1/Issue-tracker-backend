@@ -29,6 +29,8 @@ const ticketsSchema = new Schema(
       ref: "Profile",
     },
     completed: { type: Boolean, default: false },
+    tempUUID: String,
+    imageUrl: String,
   },
   {
     timestamps: true,

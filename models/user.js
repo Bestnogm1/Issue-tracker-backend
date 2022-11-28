@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema(
     name: String,
     email: { type: String, required: true, lowercase: true, unique: true },
     password: String,
-    userImage: [],
+    lastName: String,
+    profilePicture: String,
     profile: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
   },
   {
