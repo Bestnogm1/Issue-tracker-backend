@@ -18,6 +18,10 @@ router.post(
 router.use(decodeUserFromToken);
 router.post("/", checkAuth, ticketsController.create);
 router.post("/updateTicketStatus", checkAuth, ticketsController.updateStatus);
-router.delete("/deleteTicket/:id", checkAuth, ticketsController.deleteTicket);
+router.delete(
+  "/deleteTicket/:tempUUID",
+  checkAuth,
+  ticketsController.deleteTicket
+);
 
 export { router };

@@ -77,7 +77,7 @@ export const getAllTicketImage = async (tickets) => {
       };
       const command = new GetObjectCommand(getAllTicketToImageParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 571000 });
-      ticket.imageUrl = url;
+      if (ticket.imageUrl) ticket.imageUrl = url;
       return [...tickets];
     }
   } catch (error) {

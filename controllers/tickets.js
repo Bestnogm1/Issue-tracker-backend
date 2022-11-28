@@ -35,9 +35,9 @@ const create = async (req, res) => {
 
 const updateStatus = async (req, res) => {
   try {
-    const { _id, status } = req.body;
-    const ticket = await Ticket.findByIdAndUpdate(
-      { _id: _id },
+    const { tempUUID, status } = req.body;
+    const ticket = await Ticket.findOneAndUpdate(
+      { tempUUID: tempUUID },
       { status: status }
     );
     ticket.save();
@@ -50,19 +50,24 @@ const updateStatus = async (req, res) => {
 
 const deleteTicket = async (req, res) => {
   try {
-    const tickets = await Ticket.findById(req.params.id);
-    deleteImageFromS3(tickets);
-    deleteMessageAssignedWithTicket(req.params.id);
-    const deletedTicket = await Ticket.findByIdAndDelete(req.params.id);
-    for (const id of deletedTicket.assignees) {
-      const profile = await Profile.findByIdAndUpdate(id);
-      profile.ticketAssignedToMe.remove({ _id: deletedTicket._id });
-      profile.save();
-    }
+    const { tempUUID } = req.params;
+    const tickets = await Ticket.findOne({ tempUUID: tempUUID });
+    await deleteImageFromS3(tickets);
+    await deleteMessageAssignedWithTicket(tickets._id);
+    const deletedTicket = await Ticket.findByIdAndDelete(tickets._id);
+    await deletedTicketFromAssignees(deletedTicket);
     res.sendStatus(200);
   } catch (error) {
     console.error(error);
     res.status(500).json(err);
+  }
+};
+
+const deletedTicketFromAssignees = async (deletedTicket) => {
+  for (const ticketId of deletedTicket.assignees) {
+    const profile = await Profile.findByIdAndUpdate(ticketId);
+    profile.ticketAssignedToMe.remove({ _id: deletedTicket._id });
+    profile.save();
   }
 };
 
