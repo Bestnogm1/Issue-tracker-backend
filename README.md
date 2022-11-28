@@ -22,21 +22,33 @@ git clone https://github.com/Bestnogm1/tikcet-backend.git
 touch .env
 ```
 
-4.
+4. Add your .evn dependency
 
 ```bash
-DATABASE_URL=mongodb+srv://<your-username>:<your-password>@cluster0.53jre.mongodb.net/<datbase-name>?retryWrites=true&w=majority
+DATABASE_URL=mongodb+srv://<your-username>:<your-password>@cluster0.53jre.mongodb.net/<database-name>?retryWrites=true&w=majority
 
 SECRET=<create-a-secret-key>
 ```
 
-5. Install all dependencies by running the command.
+6. Set up your AWS S3 Bucket ENV variable
+
+```bash
+BUCKET_NAME=<Add-AWS-Bucket-Name>
+
+BUCKET_REGION=<Add-AWS-Region-Name>
+
+ACCESS_KEY=<Add-AWS-Access-Key>
+
+SECRET_ACCESS_KEY=<Add-AWS-Secret-Access-Key>
+```
+
+7. Install all dependencies by running the command.
 
 ```bash
 npm i
 ```
 
-6. Spin up the app by running the command.
+8. Spin up the app by running the command.
 
 ```bash
 npm start
@@ -54,8 +66,9 @@ npm start
 ![](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1)
 ![](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=whit)
 ![](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=whit)
-![](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=whit)
+![Chakra](https://img.shields.io/badge/chakra-%234ED1C5.svg?style=for-the-badge&logo=chakraui&logoColor=white)
 ![](https://img.shields.io/badge/Font_Awesome-339AF0?style=for-the-badge&logo=fontawesome&logoColor=whit)
 ![](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=whit)
 ![](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=whit)
-![](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
