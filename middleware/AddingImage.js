@@ -1,11 +1,9 @@
 import {
   S3Client,
   PutObjectCommand,
-  GetObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Ticket } from "../models/tickets.js";
 
 const bucketName = process.env.BUCKET_NAME;
@@ -31,26 +29,24 @@ export const addImagesToTicket = async (req, res) => {
     };
     const command = new PutObjectCommand(params);
     await s3.send(command);
-    sendImageToS3Bucket(req.body.uuid);
+    await sendImageToS3Bucket(req.body.uuid, res);
     res.sendStatus(200);
   } catch (error) {
     if (error) res.send(error);
   }
 };
 
-export async function sendImageToS3Bucket(tempUUID) {
+export async function sendImageToS3Bucket(tempUUID, res) {
   try {
-    const GetImageParams = {
-      Bucket: bucketName,
-      Key: tempUUID,
-    };
-    const command = new GetObjectCommand(GetImageParams);
-    const url = await getSignedUrl(s3, command, { expiresIn: 571000 });
-    const ticket = await Ticket.findOne({ tempUUID: tempUUID });
-    ticket.imageUrl = url;
+    const ticket = await Ticket.findOneAndUpdate(
+      { tempUUID: tempUUID },
+      {
+        imageUrl: `https://issuetrackerimage.s3.amazonaws.com/${tempUUID}`,
+      }
+    );
     ticket.save();
   } catch (error) {
-    console.error(err);
+    console.error(error);
     res.status(500).json(err);
   }
 }
@@ -65,23 +61,5 @@ export const deleteImageFromS3 = async (tickets) => {
     await s3.send(command);
   } catch (error) {
     if (error) console.error(error);
-  }
-};
-
-export const getAllTicketImage = async (tickets) => {
-  try {
-    for (const ticket of tickets) {
-      const getAllTicketToImageParams = {
-        Bucket: bucketName,
-        Key: ticket.tempUUID,
-      };
-      const command = new GetObjectCommand(getAllTicketToImageParams);
-      const url = await getSignedUrl(s3, command, { expiresIn: 571000 });
-      if (ticket.imageUrl) ticket.imageUrl = url;
-      return [...tickets];
-    }
-  } catch (error) {
-    console.error(err);
-    res.status(500).json(err);
   }
 };

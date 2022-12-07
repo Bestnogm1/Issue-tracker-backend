@@ -15,9 +15,9 @@ router.post(
   addImagesToTicket
 );
 /*---------- Protected Routes ----------*/
+router.post("/updateTicketStatus", ticketsController.updateStatus);
 router.use(decodeUserFromToken);
 router.post("/", checkAuth, ticketsController.create);
-router.post("/updateTicketStatus", checkAuth, ticketsController.updateStatus);
 router.delete(
   "/deleteTicket/:tempUUID",
   checkAuth,

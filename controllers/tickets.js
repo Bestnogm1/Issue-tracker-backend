@@ -1,16 +1,12 @@
 import { Ticket } from "../models/tickets.js";
 import { Message } from "../models/message.js";
 import { Profile } from "../models/profile.js";
-import {
-  deleteImageFromS3,
-  getAllTicketImage,
-} from "../middleware/AddingImage.js";
+import { deleteImageFromS3 } from "../middleware/AddingImage.js";
 
 const getAllTicket = async (req, res) => {
   try {
     const allTicket = await Ticket.find({}).populate(["owner", "assignees"]);
-    const ticketWithImage = await getAllTicketImage(allTicket);
-    res.json(ticketWithImage);
+    res.json(allTicket);
   } catch (error) {
     console.error(error);
     res.status(500).json(err);

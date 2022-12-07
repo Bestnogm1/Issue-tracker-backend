@@ -3,11 +3,6 @@ import { Profile } from "../models/profile.js";
 import jwt from "jsonwebtoken";
 import * as path from "path";
 
-const randomHexCodeColor = () => {
-  const hexCodes = ["442288", "6CA2EA", "B5D33D", "EB7D5B", "FED23F"];
-  return hexCodes[Math.floor(Math.random() * 5)];
-};
-
 function signup(req, res) {
   Profile.findOne({ email: req.body.email })
     .then((profile) => {
