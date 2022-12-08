@@ -1,11 +1,15 @@
 import { Ticket } from "../models/tickets.js";
 import { Message } from "../models/message.js";
 import { Profile } from "../models/profile.js";
-import { deleteImageFromS3 } from "../middleware/AddingImage.js";
+import {
+  deleteImageFromS3,
+  sendImageToS3Bucket,
+} from "../middleware/AddingImage.js";
 
 const getAllTicket = async (req, res) => {
   try {
     const allTicket = await Ticket.find({}).populate(["owner", "assignees"]);
+
     res.json(allTicket);
   } catch (error) {
     console.error(error);
@@ -16,7 +20,8 @@ const getAllTicket = async (req, res) => {
 const create = async (req, res) => {
   try {
     const createdTicket = await Ticket.create(req.body.ticketForm);
-    const tickets = await createdTicket.populate(["owner"]);
+    const tickets = await createdTicket.populate("owner");
+    if (tickets.imageUrl) await sendImageToS3Bucket(tickets.tempUUID, res);
     for (const ticket of tickets.assignees) {
       const profiles = await Profile.findById({ _id: ticket._id });
       profiles.ticketAssignedToMe.push(createdTicket);
